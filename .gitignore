@@ -1,1 +1,4 @@
+*.csv
+raw_data/
+recoded_data/
 
