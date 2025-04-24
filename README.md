@@ -11,7 +11,7 @@ This repository is part of the Multivariate Analysis course at the University of
 ## Team Members & Roles
 - **Wen**: Import, clean, run regression
 - **Yue**: Create plot, write report
-- **Ani (me)**: GitHub setup, folder structure, README, integration
+- **Ani**: GitHub setup, folder structure, README, integration
 
 ## How to Run This Project
 1. Run `src/Ce1_Part1_dataimport_cleaning_regression.R`
