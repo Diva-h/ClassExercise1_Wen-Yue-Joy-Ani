@@ -1,0 +1,80 @@
+---
+title: "Life Satisfaction Analysis between Full-time and Non-Full-time Workers"
+author: "Wen Yu, Ani Hovhannisyan, Yue He(Joy)"
+date: "2025-04-21"
+output: html_document
+---
+
+## Introduction & Methods
+This report analyzes the status of life satisfaction among people working full-time and non-full-time in Germany.
+We test the following Null-Hypothesis:
+H0: No difference in life satisfaction between Full-time and Non-full-time workers in Germany
+
+We used the variable `mainact` to define employment type.
+It was recoded into a binary variable `work_type`, where “Paid work” was labeled as “Full-time” and all other types (e.g., Retired, Education, Housework.etc) were grouped as “Not full time”.
+
+```{r}
+
+library(haven)
+library(dplyr)
+ess11_de <- read_sav('ESS11-subset.sav') #Please put the data file I uploaded in the whatsapp chat in your 'Sandbox' so that you can import the original data
+ess11_clean <- ess11_de %>% 
+  select(mainact, stflife) %>% 
+  mutate(stflife=ifelse(stflife==88, NA, stflife))%>%#set the 88 into NA, so that we can delect them in the following code
+  filter(!is.na(mainact), !is.na(stflife)) %>% #select the variables that we need and get rid of the empty values
+  mutate(mainact=as_factor(mainact)) #convert the mainact into the proper categorical variables with readable value in R
+table(ess11_clean$mainact)#check if the data has been cleand successfully
+ess11_analysis <- ess11_clean %>%
+  mutate(work_type=ifelse(mainact=='Paid work',
+                          'Full-time',
+                          'Not full time')) #divide the work_type into two categories: 'Full-time' and 'Not full time' and add an column to the data
+
+
+```
+
+
+## Regression Results
+According to the linear regression results, the Mean of life satisfaction score for full-time workers was 7.66, while for non-full-time workers it was 7.84. There was no statistically significant difference in life satisfaction between full-time and part-time workers (β = 0.18, p = 0.274 > 0.05). Meanwhile, the 95% CI is between (-0.14,0.50), includes 0. Suggesting that employment type may not be a strong predictor of life satisfaction in this sample. We can't reject the Null-Hypothesis.
+
+```{r}
+
+ess11_analysis %>%
+  group_by(work_type)%>%
+  summarise(main_satisfaction=mean(stflife))
+#by the code above, we can see that the mean of main_satisfaction of Full-time is less than that of Not full time
+model <- lm(stflife ~ work_type, data = ess11_analysis, na.action=na.omit)
+summary(model)#run the regression model, I will send the analysis of this in the whatsapp chat
+
+```
+
+## Boxplot
+```{r}
+
+library(ggplot2)
+library(tidyverse)
+# draw a boxplot
+ggplot(ess11_analysis, 
+       aes(x = work_type,
+           y = stflife,
+           fill = work_type)) +
+  geom_boxplot() +
+  labs(
+    title = "Life Satisfaction by Employment Type",
+    x = "Employment Type",
+    y = "Life Satisfaction Score (0-10)",
+    fill = "Work Type"
+  )
+
+# dir.create("data_clean", showWarnings = FALSE)
+# write_rds(ess11_analysis, "data_clean/ess11_analysis.rds")
+
+```
+
+## Conclusion
+Our analysis does not support the hypothesis that there's no significant difference in life satisfaction between Full-time and Non-full-time workers in Germany.
+However, The sample size (N=440) may not be sufficient to detect small effects. For further analysis, it may be necessary to control for latent variables (age, gender, income, etc.), and cross-test for them.
+
+## Members & Contributions
+Wen Yu: Data Import, Cleaning & Regression Analysis  
+Yue He(Joy): Visualization (Boxplot), Report Writing  
+Ani Hovhannisyan: GitHub Repository Setup, README, Integration
